@@ -408,6 +408,7 @@ frc::InterruptableSensorBase::~InterruptableSensorBase()
 {
 }
 
+
 #include <frc/Watchdog.h>
 
 frc::Watchdog::Watchdog(double timeout, std::function<void()> callback)

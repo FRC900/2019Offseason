@@ -901,14 +901,14 @@ class TalonCIParams
 			return true;
 		}
 		bool stringToLimitSwitchNormal(const std::string &str,
-									   hardware_interface::LimitSwitchNormal &limit_switch_source) const
+									   hardware_interface::LimitSwitchNormal &limit_switch_normal) const
 		{
 			if (str == "NormallyOpen")
-				limit_switch_source = hardware_interface::LimitSwitchNormal_NormallyOpen;
+				limit_switch_normal = hardware_interface::LimitSwitchNormal_NormallyOpen;
 			else if (str == "NormallyClosed")
-				limit_switch_source = hardware_interface::LimitSwitchNormal_NormallyClosed;
+				limit_switch_normal = hardware_interface::LimitSwitchNormal_NormallyClosed;
 			else if (str == "Disabled")
-				limit_switch_source = hardware_interface::LimitSwitchNormal_Disabled;
+				limit_switch_normal = hardware_interface::LimitSwitchNormal_Disabled;
 			else
 			{
 				ROS_ERROR_STREAM("Invalid limit switch normal : " << str);
@@ -1030,9 +1030,6 @@ class TalonControllerInterface
 
 		// Read params from config file and use them to
 		// initialize the Talon hardware
-		// Useful for the hopefully common case where there's
-		// no need to modify the parameters after reading
-		// them
 		virtual bool initWithNode(hardware_interface::TalonCommandInterface *tci,
 								  hardware_interface::TalonStateInterface * /*tsi*/,
 								  ros::NodeHandle &n)
@@ -1679,8 +1676,8 @@ class TalonControllerInterface
 		// actual write to the hardware in write() in the hardware
 		// interface
 		virtual void writeParamsToHW(const TalonCIParams &params,
-				hardware_interface::TalonCommandHandle talon,
-				bool update_params = true)
+									 hardware_interface::TalonCommandHandle &talon,
+									 bool update_params = true)
 		{
 			talon->lock();
 			// perform additional hardware init here

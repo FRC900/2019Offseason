@@ -7,6 +7,7 @@
 #include <frc_interfaces/pdp_state_interface.h>
 #include <frc_interfaces/pcm_state_interface.h>
 #include <talon_interface/talon_state_interface.h>
+#include <spark_max_interface/spark_max_state_interface.h>
 #include <frc_interfaces/match_data_interface.h>
 
 // Create a separate type of joint interface for joints which
@@ -62,5 +63,6 @@ namespace hardware_interface
 	class RemotePCMStateInterface   : public HardwareResourceManager<PCMWritableStateHandle,   ClaimResources> {};
 	class RemoteMatchStateInterface : public HardwareResourceManager<MatchStateWritableHandle, ClaimResources> {};
 	class RemoteTalonStateInterface : public HardwareResourceManager<TalonWritableStateHandle, ClaimResources> {};
+	class RemoteSparkMaxStateInterface : public HardwareResourceManager<SparkMaxWritableStateHandle, ClaimResources> {};
 }
 

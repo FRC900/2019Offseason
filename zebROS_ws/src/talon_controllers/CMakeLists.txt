@@ -10,7 +10,6 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
   realtime_tools
   talon_interface
-  urdf
   dynamic_reconfigure
 )
 
@@ -27,7 +26,6 @@ catkin_package(
 	message_runtime
     realtime_tools
 	talon_interface
-    urdf
 	dynamic_reconfigure
   INCLUDE_DIRS include
   #LIBRARIES ${PROJECT_NAME}

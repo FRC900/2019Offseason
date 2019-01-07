@@ -1,15 +1,18 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(frc_interfaces)
+project(spark_max_controllers)
 
-include("../cmake_modules/CMakeOpt.cmake")
+include ("../cmake_modules/CMakeOpt.cmake")
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  control_msgs
+  controller_interface
+  dynamic_reconfigure
+  message_generation
+  realtime_tools
   roscpp
-  state_handle
-  talon_interface
   spark_max_interface
 )
 
@@ -70,7 +73,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate added messages and services with any dependencies listed here
 # generate_messages(
 #   DEPENDENCIES
-#   std_msgs  # Or other packages containing msgs
+#   contol_msgs
 # )
 
 ################################################
@@ -103,9 +106,9 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-   INCLUDE_DIRS include
-#  LIBRARIES frc_interfaces
-   CATKIN_DEPENDS state_handle roscpp talon_interface spark_max_interface
+#  INCLUDE_DIRS include
+#  LIBRARIES spark_max_controllers
+#  CATKIN_DEPENDS control_msgs controller_interface dynamic_reconfigure message_generation realtime_tools roscpp spark_max_interface
 #  DEPENDS system_lib
 )
 
@@ -116,13 +119,13 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-  include
+# include
   ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/frc_interfaces.cpp
+#   src/${PROJECT_NAME}/spark_max_controllers.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -133,7 +136,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/frc_interfaces_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/spark_max_controllers_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -172,11 +175,11 @@ include_directories(
 # )
 
 ## Mark cpp header files for installation
-install(DIRECTORY include/${PROJECT_NAME}/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-  FILES_MATCHING PATTERN "*.h"
-  PATTERN ".svn" EXCLUDE
-)
+# install(DIRECTORY include/${PROJECT_NAME}/
+#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+#   FILES_MATCHING PATTERN "*.h"
+#   PATTERN ".svn" EXCLUDE
+# )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 # install(FILES
@@ -190,7 +193,7 @@ install(DIRECTORY include/${PROJECT_NAME}/
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_frc_interfaces.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_spark_max_controllers.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

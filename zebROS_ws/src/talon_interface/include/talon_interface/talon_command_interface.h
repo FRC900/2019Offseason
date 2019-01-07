@@ -1,7 +1,6 @@
 #pragma once
 
 #include <mutex>
-#include <string>
 #include <talon_interface/talon_state_interface.h>
 
 namespace hardware_interface

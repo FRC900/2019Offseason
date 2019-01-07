@@ -78,6 +78,7 @@ FRCRobotInterface::FRCRobotInterface(ros::NodeHandle &nh, urdf::Model *urdf_mode
 	  name_("generic_hw_interface")
 	, nh_(nh)
 	, num_can_ctre_mcs_(0)
+	, num_spark_maxs_(0)
 	, num_nidec_brushlesses_(0)
 	, num_digital_inputs_(0)
 	, num_digital_outputs_(0)
@@ -168,6 +169,37 @@ FRCRobotInterface::FRCRobotInterface(ros::NodeHandle &nh, urdf::Model *urdf_mode
 			can_ctre_mc_local_updates_.push_back(local_update);
 			can_ctre_mc_local_hardwares_.push_back(local_hardware);
 			can_ctre_mc_is_talon_.push_back(joint_type == "can_talon_srx");
+		}
+		else if (joint_type == "can_spark_max")
+		{
+			if (!joint_params.hasMember("can_id"))
+				throw std::runtime_error("A CAN Spark Max can_id was not specified");
+			XmlRpc::XmlRpcValue &xml_can_id = joint_params["can_id"];
+			if (!xml_can_id.valid() ||
+				xml_can_id.getType() != XmlRpc::XmlRpcValue::TypeInt)
+				throw std::runtime_error("An invalid joint can_id was specified (expecting an int).");
+			const int can_id = xml_can_id;
+
+			readJointLocalParams(joint_params, local, saw_local_keyword, local_update, local_hardware);
+
+			if (!joint_params.hasMember("motor_type"))
+				throw std::runtime_error("A CAN Spark Max motor_type was not specified");
+			XmlRpc::XmlRpcValue &xml_motor_type = joint_params["motor_type"];
+			if (!xml_motor_type.valid() ||
+					xml_motor_type.getType() != XmlRpc::XmlRpcValue::TypeString)
+				throw std::runtime_error("An invalid motor_type was specified (expecting a string)");
+			const std::string motor_type = xml_motor_type;
+			if (motor_type == "brushed")
+				spark_max_motor_types_.push_back(hardware_interface::kBrushed);
+			else if (motor_type == "brushless")
+				spark_max_motor_types_.push_back(hardware_interface::kBrushless);
+			else
+				throw std::runtime_error("Motor_type not valid : expecting \"brushed\" or \"brushless\"");
+
+			spark_max_names_.push_back(joint_name);
+			spark_max_can_ids_.push_back(can_id);
+			spark_max_local_updates_.push_back(local_update);
+			spark_max_local_hardwares_.push_back(local_hardware);
 		}
 		else if (joint_type == "nidec_brushless")
 		{
@@ -727,6 +759,43 @@ void FRCRobotInterface::init()
 		custom_profile_state_.push_back(CustomProfileState());
 	}
 
+	num_spark_maxs_ = spark_max_names_.size();
+	// Create vectors of the correct size for
+	// Spark Max HW state and commands
+	spark_max_command_.resize(num_spark_maxs_);
+
+	for (size_t i = 0; i < num_spark_maxs_; i++)
+	{
+		ROS_INFO_STREAM_NAMED(name_, "FRCRobotInterface: Registering Spark Max Interface for " << spark_max_names_[i] << " at hw ID " << spark_max_can_ids_[i]);
+
+		// Create joint state interface
+		// Also register as JointStateInterface so that legacy
+		// ROS code which uses that object type can
+		// access basic state info from the spark max
+		// Code which needs more specific status should
+		// get a TalonStateHandle instead.
+		spark_max_state_.push_back(hardware_interface::SparkMaxHWState(spark_max_can_ids_[i], spark_max_motor_types_[i]));
+	}
+	for (size_t i = 0; i < num_spark_maxs_; i++)
+	{
+		// Create state interface for the given Talon
+		// and point it to the data stored in the
+		// corresponding spark_max_state array entry
+		hardware_interface::SparkMaxStateHandle smsh(spark_max_names_[i], &spark_max_state_[i]);
+		spark_max_state_interface_.registerHandle(smsh);
+
+		// Do the same for a command interface for
+		// the same spark_max
+		hardware_interface::SparkMaxCommandHandle smch(smsh, &spark_max_command_[i]);
+		spark_max_command_interface_.registerHandle(smch);
+		if (!spark_max_local_updates_[i])
+		{
+			hardware_interface::SparkMaxWritableStateHandle smwsh(spark_max_names_[i], &spark_max_state_[i]); /// writing directly to state?
+			spark_max_remote_state_interface_.registerHandle(smwsh);
+		}
+		custom_profile_state_.push_back(CustomProfileState());
+	}
+
 	// Set vectors to correct size to hold data
 	// for each of the brushless motors we're trying
 	// to control
@@ -1071,8 +1140,11 @@ void FRCRobotInterface::init()
 	// the DS
 	registerInterface(&talon_state_interface_);
 	registerInterface(&talon_remote_state_interface_);
+	registerInterface(&spark_max_state_interface_);
+	registerInterface(&spark_max_remote_state_interface_);
 	registerInterface(&joint_state_interface_);
 	registerInterface(&talon_command_interface_);
+	registerInterface(&spark_max_command_interface_);
 	registerInterface(&joint_command_interface_);
 	registerInterface(&joint_position_interface_);
 	registerInterface(&joint_velocity_interface_);

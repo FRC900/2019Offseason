@@ -21,6 +21,7 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
   frc_msgs
   frc_interfaces
+  spark_max_interface
 )
 
 add_message_files (
@@ -60,6 +61,7 @@ catkin_package(
 	rosparam_shortcuts
 	talon_interface
 	message_runtime
+	spark_max_interface
   LIBRARIES
 )
 
@@ -68,7 +70,7 @@ catkin_package(
 ###########
 
 include_directories(
-  include/
+  include
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -152,6 +154,8 @@ if ("${ARM_PREFIX}" STREQUAL "arm-frc2020-linux-gnueabi")
 		${WPI_SHARED_LIB_DIR}/libnirio_emb_can.so.16.0.0
 		${WPI_SHARED_LIB_DIR}/libni_rtlog.so.2.8.0
 		${WPI_SYSROOT}/lib/navx/linux/athena/static/libnavx_frc.a
+		${WPI_SYSROOT}/lib/rev/linux/athena/static/libSparkMax.a
+		${WPI_SYSROOT}/lib/rev/linux/athena/static/libSparkMaxDriver.a
 	)
 elseif ("${CMAKE_LIBRARY_ARCHITECTURE}" STREQUAL "arm-linux-gnueabihf") # Jetson TK1
 	set (CTRE_LIB_DIR ${WPI_SYSROOT}/lib/ctre/linux/raspbian/static)    # Who knows if this will work
@@ -183,6 +187,9 @@ if (NOT "${ARM_PREFIX}" STREQUAL "arm-frc2020-linux-gnueabi")
 		${CTRE_LIB_DIR}/libCTRE_PhoenixCanutils.a
 	)
 
+#set(SPARK_MAX ../../../spark_max)
+#include_directories(${SPARK_MAX}/include)
+
 	set (FRCROBOT_HW_MAIN_SRCS ${FRCROBOT_HW_MAIN_SRCS} 
 		src/dummy_wpilib_common.cpp
 		src/dummy_wpilib_hw.cpp
@@ -206,6 +213,12 @@ if (NOT "${ARM_PREFIX}" STREQUAL "arm-frc2020-linux-gnueabi")
 		${ALLWPILIB}/wpiutil/src/main/native/cpp/llvm/SmallVector.cpp
 		${ALLWPILIB}/wpiutil/src/main/native/cpp/llvm/StringRef.cpp
 		${ALLWPILIB}/wpiutil/src/main/native/cpp/llvm/Twine.cpp
+		#${SPARK_MAX}/src/CANDigitalInput.cpp
+		#${SPARK_MAX}/src/CANEncoder.cpp
+		#${SPARK_MAX}/src/CANPIDController.cpp
+		#${SPARK_MAX}/src/CANSparkMax.cpp
+		#${SPARK_MAX}/src/CANSparkMaxLowLevel.cpp
+		#${SPARK_MAX}/src/SparkMax.cpp
 	)
 
 	file(GLOB
@@ -325,6 +338,12 @@ if (NOT "${ARM_PREFIX}" STREQUAL "arm-frc2020-linux-gnueabi")
 			${ALLWPILIB}/wpiutil/src/main/native/unix/Demangle.cpp
 			${ALLWPILIB}/wpiutil/src/main/native/unix/StackTrace.cpp
 			${ntcore_native_src}
+			#${SPARK_MAX}/src/CANDigitalInput.cpp
+			#${SPARK_MAX}/src/CANEncoder.cpp
+			#${SPARK_MAX}/src/CANPIDController.cpp
+			#${SPARK_MAX}/src/CANSparkMax.cpp
+			#${SPARK_MAX}/src/CANSparkMaxLowLevel.cpp
+			#${SPARK_MAX}/src/SparkMax.cpp
 		)
 
 		if (NOT (("${CMAKE_LIBRARY_ARCHITECTURE}" STREQUAL "arm-linux-gnueabihf") OR
