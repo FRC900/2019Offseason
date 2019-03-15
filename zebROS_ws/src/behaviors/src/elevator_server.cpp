@@ -10,7 +10,7 @@
 //TODO: not global. namespace?
 double elevator_position_deadzone;
 
-constexpr int min_climb_idx = ELEVATOR_DEPLOY; //reference to minimum index in enumerated elevator indices, used for determining which indices are for climbing (this idx or greater)
+constexpr size_t min_climb_idx = ELEVATOR_DEPLOY; //reference to minimum index in enumerated elevator indices, used for determining which indices are for climbing (this idx or greater)
 
 class ElevatorAction {
     protected:
@@ -78,7 +78,7 @@ class ElevatorAction {
 			//Determine setpoint (elevator_cur_setpoint_)
 			if(goal->setpoint_index > min_climb_idx) //then it's a climb index
 			{
-				const size_t climb_setpoint_index = setpoint_index - min_climb_idx;
+				const size_t climb_setpoint_index = goal->setpoint_index - min_climb_idx;
 				if(climb_setpoint_index < climb_locations_.size())
 					elevator_cur_setpoint_ = climb_locations_[climb_setpoint_index];
 				else
@@ -89,8 +89,8 @@ class ElevatorAction {
 			}
 			else if(goal->place_cargo)
 			{
-				if(setpoint_index < cargo_locations_.size())
-					elevator_cur_setpoint_ = cargo_locations_[setpoint_index];
+				if(goal->setpoint_index < cargo_locations_.size())
+					elevator_cur_setpoint_ = cargo_locations_[goal->setpoint_index];
 				else
 				{
 					ROS_ERROR_STREAM("index out of bounds in elevator_server");
@@ -99,8 +99,8 @@ class ElevatorAction {
 			}
 			else
 			{
-				if(setpoint_index < hatch_locations_.size())
-					elevator_cur_setpoint_ = hatch_locations_[setpoint_index];
+				if(goal->setpoint_index < hatch_locations_.size())
+					elevator_cur_setpoint_ = hatch_locations_[goal->setpoint_index];
 				else
 				{
 					ROS_ERROR_STREAM("index out of bounds in elevator_server");
@@ -122,7 +122,7 @@ class ElevatorAction {
 				elevator_controller::ElevatorSrv srv;
 				srv.request.position = elevator_cur_setpoint_;
 				srv.request.go_slow = false; //default
-				if(setpoint_index >= min_climb_idx) //then climbing, go slow
+				if(goal->setpoint_index >= min_climb_idx) //then climbing, go slow
 				{
 					srv.request.go_slow = true;
 				}
