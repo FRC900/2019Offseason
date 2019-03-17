@@ -170,18 +170,20 @@ class ElevatorAction {
 			{
 				ROS_INFO("%s:Timed Out", action_name_.c_str());
 				result.success = false;
+				as_.setSucceeded(result);
 			}
 			else if(preempted)
 			{
 				ROS_INFO("%s:Preempted", action_name_.c_str());
 				result.success = false;
+				as_.setPreempted(result);
 			}
 			else //implies succeeded
 			{
 				ROS_INFO("%s:Succeeded", action_name_.c_str());
 				result.success = true;
+				as_.setSucceeded(result);
 			}
-			as_.setSucceeded(result);
 
 			feedback.running = false;
 			as_.publishFeedback(feedback);
