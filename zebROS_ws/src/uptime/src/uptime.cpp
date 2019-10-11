@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
   ros::init(argc, argv, "uptime_node");
   ros::NodeHandle node;
   ros::Publisher pub = node.advertise<std_msgs::UInt64>("uptime", 1);
-  ros::Rate loop_rate(10);
+  ros::Rate loop_rate(1);
 
   while (ros::ok()) {
     std_msgs::UInt64 m;
