@@ -27,6 +27,7 @@ int main(int argc, char *argv[]) {
     m.data = si.uptime;
     pub.publish(m);
     ros::spinOnce();
+    loop_rate.sleep;
   }
 
   return 0;
