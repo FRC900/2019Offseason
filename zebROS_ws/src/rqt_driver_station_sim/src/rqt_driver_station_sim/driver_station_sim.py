@@ -6,7 +6,8 @@ import argparse
 import rospy
 import rospkg
 import threading
-
+from PyQt5 import QtCore
+from PyQt5 import QtGui 
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import QWidget
@@ -14,8 +15,30 @@ from python_qt_binding.QtWidgets import QWidget
 from ros_control_boilerplate.msg import AutoMode
 from frc_msgs.msg import MatchSpecificData
 
-
 class DriverStationSim(Plugin):
+    def _read_joint_param(self, param_key, where, talons, ains, dins):
+        joint_param = rospy.get_param(param_key)
+        for jp in joint_param:
+            if ('local' in jp) and (jp['local'] == False):
+                continue
+            if ('local_hardware' in jp) and (jp['local_hardware'] == False):
+                continue
+            if (jp['type'] != 'can_talon_srx') and (jp['type'] != 'analog_input') and (jp['type'] != 'digital_input'):
+               continue
+            entry = {}
+            entry['where'] = where
+            entry['name'] = jp['name']
+            if (jp['type'] == 'can_talon_srx'):
+                talons.append(entry)
+            if jp['type'] == 'analog_input':
+                ains.append(entry)
+            if jp['type'] == 'digital_input':
+                dins.append(entry)
+
+        print talons
+        print ains
+        print dins
+
     def __init__(self, context):
         super(DriverStationSim, self).__init__(context)
         # Give QObjects reasonable names
@@ -47,11 +70,20 @@ class DriverStationSim(Plugin):
         # plugin at once, these lines add number to make it easy to 
         # tell from pane to pane.
 
+        talons = []
+        dins   = []
+        ains   = []
+        self._read_joint_param('/frcrobot_rio/hardware_interface/joints', 'rio', talons, ains, dins)
+        self._read_joint_param('/frcrobot_jetson/hardware_interface/joints', 'jetson', talons, ains, dins)
+
+        self._widget.b1 = QtGui.QCheckBox(talons[0]['name'])
+        self._widget.hbox.addWidget(self._widget.b1)
+
         auto_pub = rospy.Publisher("/frcrobot_rio/autonomous_mode", AutoMode, queue_size=3)
         match_pub = rospy.Publisher("/frcrobot_rio/match_data_in", MatchSpecificData, queue_size=3)
 
         def pub_data(self):
-            r = rospy.Rate(100)
+            r = rospy.Rate(20)
             auto_msg = AutoMode()
             auto_msg.mode = [0, 0, 0, 0]
             auto_msg.delays = [0, 0, 0, 0]
