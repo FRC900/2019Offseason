@@ -6,8 +6,9 @@ import argparse
 import rospy
 import rospkg
 import threading
-from PyQt5 import QtCore
-from PyQt5 import QtGui 
+from PyQt5.QtWidgets import QWidget, QCheckBox, QApplication, QHBoxLayout, QVBoxLayout
+from PyQt5 import QtCore, QtWidgets
+#from PyQt5 import QtGui 
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import QWidget
@@ -76,12 +77,60 @@ class DriverStationSim(Plugin):
         self._read_joint_param('/frcrobot_rio/hardware_interface/joints', 'rio', talons, ains, dins)
         self._read_joint_param('/frcrobot_jetson/hardware_interface/joints', 'jetson', talons, ains, dins)
 
-        self._widget.b1 = QtGui.QCheckBox(talons[0]['name'])
-        self._widget.hbox.addWidget(self._widget.b1)
+        #self._widget.talons_tab = QtWidgets.QWidget(self._widget)
+        #self._widget.talons_tab.setObjectName("talons_tab")
+        self._widget.sim_input_layout_widget = QtWidgets.QWidget(self._widget.tab_4)
+        self._widget.sim_input_layout_widget.setObjectName("sim_input_layout_widget")
+        self._widget.sim_input_horizontal_layout = QtWidgets.QHBoxLayout(self._widget.sim_input_layout_widget)
+        self._widget.sim_input_horizontal_layout.setObjectName("sim_input_horizontal_layout")
+        self._widget.talon_f_vertical_layout = QtWidgets.QVBoxLayout()
+        self._widget.talon_f_vertical_layout.setObjectName("talon_f_vertical_layout")
+        self._widget.talon_r_vertical_layout = QtWidgets.QVBoxLayout()
+        self._widget.talon_r_vertical_layout.setObjectName("talon_r_vertical_layout")
+        self._widget.talon_f_buttons = []
+        self._widget.talon_r_buttons = []
+        fh = 17
+        for i in range(len(talons)):
+            self._widget.talon_f_buttons.append(QCheckBox("F", self._widget.sim_input_layout_widget))
+            self._widget.talon_f_buttons[i].setObjectName(talons[i]['name'] + "%F")
+            self._widget.talon_f_buttons[i].setFixedHeight(fh)
+            self._widget.talon_f_vertical_layout.addWidget(self._widget.talon_f_buttons[i])
+            self._widget.talon_r_buttons.append(QCheckBox("R | " + talons[i]['name'], self._widget.sim_input_layout_widget))
+            self._widget.talon_r_buttons[i].setObjectName(talons[i]['name'] + "%R")
+            self._widget.talon_r_buttons[i].setFixedHeight(fh)
+            self._widget.talon_r_vertical_layout.addWidget(self._widget.talon_r_buttons[i])
+        self._widget.sim_input_horizontal_layout.addLayout(self._widget.talon_f_vertical_layout)
+        self._widget.sim_input_horizontal_layout.addLayout(self._widget.talon_r_vertical_layout)
+
+        self._widget.din_vertical_layout = QtWidgets.QVBoxLayout()
+        self._widget.din_vertical_layout.setObjectName("din_vertical_layout")
+        self._widget.din_buttons = []
+        for i in range(len(dins)):
+            self._widget.din_buttons.append(QCheckBox(dins[i]['name'], self._widget.sim_input_layout_widget))
+            self._widget.din_buttons[i].setObjectName(dins[i]['name'])
+            self._widget.din_buttons[i].setFixedHeight(fh)
+            self._widget.din_vertical_layout.addWidget(self._widget.din_buttons[i])
+        self._widget.sim_input_horizontal_layout.addLayout(self._widget.din_vertical_layout)
+
+        self._widget.ain_vertical_layout = QtWidgets.QVBoxLayout()
+        self._widget.ain_vertical_layout.setObjectName("ain_vertical_layout")
+        self._widget.ain_buttons = []
+        for i in range(len(ains)):
+            self._widget.ain_buttons.append(QDoubleSpinBox(ains[i]['name'], self._widget.sim_input_layout_widget))
+            self._widget.ain_buttons[i].setObjectName(ains[i]['name'])
+            self.delay_0.setDecimals(2)
+            self.delay_0.setMaximum(12.0)
+            self.delay_0.setMinimum(-12.0)
+            self.delay_0.setSingleStep(0.1)
+            self._widget.ain_buttons[i].setFixedHeight(fh)
+            self._widget.ain_vertical_layout.addWidget(self._widget.ain_buttons[i])
+        self._widget.sim_input_horizontal_layout.addLayout(self._widget.ain_vertical_layout)
 
         auto_pub = rospy.Publisher("/frcrobot_rio/autonomous_mode", AutoMode, queue_size=3)
         match_pub = rospy.Publisher("/frcrobot_rio/match_data_in", MatchSpecificData, queue_size=3)
 
+        self._widget.disable_button_2.setChecked(True)
+        self._widget.teleop_button.setChecked(True)
         def pub_data(self):
             r = rospy.Rate(20)
             auto_msg = AutoMode()
