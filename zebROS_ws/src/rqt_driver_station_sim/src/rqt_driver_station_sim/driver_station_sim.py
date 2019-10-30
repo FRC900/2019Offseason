@@ -15,6 +15,7 @@ from python_qt_binding.QtWidgets import QWidget
 
 from ros_control_boilerplate.msg import AutoMode
 from frc_msgs.msg import MatchSpecificData
+from ros_control_boilerplate.srv import LineBreakSensors, set_limit_switch
 
 class DriverStationSim(Plugin):
     def _read_joint_param(self, param_key, where, talons, ains, dins):
@@ -39,6 +40,36 @@ class DriverStationSim(Plugin):
         print talons
         print ains
         print dins
+
+    def _talon_checkbox_handler(self, data = None):
+        sender = self.sender()
+        obj_name = sender.objectName()
+        obj_state = sender.isChecked()
+        other_obj_state = sender.other_button.isChecked()
+        if (obj_name[-2:] == "%F"): # Forward button checked
+            forward = obj_state
+            reverse = other_obj_state
+        else:
+            forward = other_obj_state
+            reverse = obj_state
+
+        try:
+            limit_switch_service = rospy.ServiceProxy('/frcrobot_' + sender.where +'/set_limit_switch', set_limit_switch)
+            #print "Calling service %s:  %d %s %d %d" %('/frcrobot_' + sender.where +'/set_limit_switch', 0, obj_name[:-2], forward, reverse)
+            limit_switch_service(0, obj_name[:-2], forward, reverse)
+        except rospy.ServiceException, e:
+            print "set_limit_switch service call failed: %s"%e
+
+
+    def _din_checkbox_handler(self, data = None):
+        sender = self.sender()
+
+        try:
+            linebreak_service = rospy.ServiceProxy('/frcrobot_' + sender.where +'/linebreak_service_set', LineBreakSensors)
+            #print "Calling service %s:  %d %s %d " %('/frcrobot_' + sender.where +'/linebreak_service_set', 0, sender.objectName(), sender.isChecked())
+            linebreak_service(0, sender.objectName(), sender.isChecked())
+        except rospy.ServiceException, e:
+            print "set_limit_switch service call failed: %s"%e
 
     def __init__(self, context):
         super(DriverStationSim, self).__init__(context)
@@ -89,15 +120,22 @@ class DriverStationSim(Plugin):
         self._widget.talon_r_vertical_layout.setObjectName("talon_r_vertical_layout")
         self._widget.talon_f_buttons = []
         self._widget.talon_r_buttons = []
-        fh = 17
+        fh = 17 # Set fixed height to prevent ugly auto-spacing
         for i in range(len(talons)):
             self._widget.talon_f_buttons.append(QCheckBox("F", self._widget.sim_input_layout_widget))
+            self._widget.talon_r_buttons.append(QCheckBox("R | " + talons[i]['name'], self._widget.sim_input_layout_widget))
+
             self._widget.talon_f_buttons[i].setObjectName(talons[i]['name'] + "%F")
             self._widget.talon_f_buttons[i].setFixedHeight(fh)
+            self._widget.talon_f_buttons[i].where = talons[i]['where']
+            self._widget.talon_f_buttons[i].other_button = self._widget.talon_r_buttons[i]
+            self._widget.talon_f_buttons[i].stateChanged.connect(self._talon_checkbox_handler)
             self._widget.talon_f_vertical_layout.addWidget(self._widget.talon_f_buttons[i])
-            self._widget.talon_r_buttons.append(QCheckBox("R | " + talons[i]['name'], self._widget.sim_input_layout_widget))
             self._widget.talon_r_buttons[i].setObjectName(talons[i]['name'] + "%R")
             self._widget.talon_r_buttons[i].setFixedHeight(fh)
+            self._widget.talon_r_buttons[i].where = talons[i]['where']
+            self._widget.talon_r_buttons[i].other_button = self._widget.talon_f_buttons[i]
+            self._widget.talon_r_buttons[i].stateChanged.connect(self._talon_checkbox_handler)
             self._widget.talon_r_vertical_layout.addWidget(self._widget.talon_r_buttons[i])
         self._widget.sim_input_horizontal_layout.addLayout(self._widget.talon_f_vertical_layout)
         self._widget.sim_input_horizontal_layout.addLayout(self._widget.talon_r_vertical_layout)
@@ -109,6 +147,8 @@ class DriverStationSim(Plugin):
             self._widget.din_buttons.append(QCheckBox(dins[i]['name'], self._widget.sim_input_layout_widget))
             self._widget.din_buttons[i].setObjectName(dins[i]['name'])
             self._widget.din_buttons[i].setFixedHeight(fh)
+            self._widget.din_buttons[i].where = dins[i]['where']
+            self._widget.din_buttons[i].stateChanged.connect(self._din_checkbox_handler)
             self._widget.din_vertical_layout.addWidget(self._widget.din_buttons[i])
         self._widget.sim_input_horizontal_layout.addLayout(self._widget.din_vertical_layout)
 
@@ -123,6 +163,7 @@ class DriverStationSim(Plugin):
             self.delay_0.setMinimum(-12.0)
             self.delay_0.setSingleStep(0.1)
             self._widget.ain_buttons[i].setFixedHeight(fh)
+            self._widget.ain_buttons[i].where = ains[i]['where']
             self._widget.ain_vertical_layout.addWidget(self._widget.ain_buttons[i])
         self._widget.sim_input_horizontal_layout.addLayout(self._widget.ain_vertical_layout)
 
