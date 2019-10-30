@@ -452,7 +452,9 @@ bool FRCRobotSimInterface::setlimit(ros_control_boilerplate::set_limit_switch::R
 		if (!can_ctre_mc_local_hardwares_[joint_id])
 			continue;
         auto &ts = talon_state_[joint_id];
-        if(ts.getCANID() == req.target_joint_id) {
+        if((!target_joint_name.length() && (ts.getCANID() == req.target_joint_id)) ||
+		   (target_joint_name == can_ctre_mc_names_[joint_id]))
+		{
             ts.setForwardLimitSwitch(req.forward);
 			ts.setReverseLimitSwitch(req.reverse);
         }
