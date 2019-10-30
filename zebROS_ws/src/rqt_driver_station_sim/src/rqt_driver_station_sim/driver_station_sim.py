@@ -37,9 +37,9 @@ class DriverStationSim(Plugin):
             if jp['type'] == 'digital_input':
                 dins.append(entry)
 
-        print talons
-        print ains
-        print dins
+        #print talons
+        #print ains
+        #print dins
 
     def _talon_checkbox_handler(self, data = None):
         sender = self.sender()
@@ -69,7 +69,7 @@ class DriverStationSim(Plugin):
             #print "Calling service %s:  %d %s %d " %('/frcrobot_' + sender.where +'/linebreak_service_set', 0, sender.objectName(), sender.isChecked())
             linebreak_service(0, sender.objectName(), sender.isChecked())
         except rospy.ServiceException, e:
-            print "set_limit_switch service call failed: %s"%e
+            print "linebreak_service call failed: %s"%e
 
     def __init__(self, context):
         super(DriverStationSim, self).__init__(context)
