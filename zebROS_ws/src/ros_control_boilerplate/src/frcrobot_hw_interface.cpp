@@ -1195,7 +1195,9 @@ void FRCRobotHWInterface::read(ros::Duration &/*elapsed_time*/)
 			robot_controller_state_.SetFPGARevision(HAL_GetFPGARevision(&status));
 			robot_controller_state_.SetFPGATime(HAL_GetFPGATime(&status));
 			robot_controller_state_.SetUserButton(HAL_GetFPGAButton(&status));
+			status = 0; //reset so that we can be sure to get the status from isSysActive
 			robot_controller_state_.SetIsSysActive(HAL_GetSystemActive(&status));
+			robot_controller_state_.SetSysActiveStatus(HAL_GetErrorMessage(status));
 			robot_controller_state_.SetIsBrownedOut(HAL_GetBrownedOut(&status));
 			robot_controller_state_.SetInputVoltage(HAL_GetVinVoltage(&status));
 			robot_controller_state_.SetInputCurrent(HAL_GetVinCurrent(&status));

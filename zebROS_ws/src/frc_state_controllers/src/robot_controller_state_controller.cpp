@@ -56,6 +56,7 @@ void RobotControllerStateController::update(const ros::Time &time, const ros::Du
 			m.fpgaTime = rcs->GetFPGATime();
 			m.userButton = rcs->GetUserButton();
 			m.isSysActive = rcs->GetIsSysActive();
+			m.sysActiveStatus = rcs->GetSysActiveStatus();
 			m.isBrownedOut = rcs->GetIsBrownedOut();
 			m.inputVoltage = rcs->GetInputVoltage();
 			m.inputCurrent = rcs->GetInputCurrent();

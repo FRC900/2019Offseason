@@ -5,6 +5,7 @@ int64 fpgaRevision
 uint64 fpgaTime
 bool userButton
 bool isSysActive
+string sysActiveStatus
 bool isBrownedOut
 float64 inputVoltage
 float64 inputCurrent
