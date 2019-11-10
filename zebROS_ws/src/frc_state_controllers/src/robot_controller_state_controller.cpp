@@ -56,7 +56,6 @@ void RobotControllerStateController::update(const ros::Time &time, const ros::Du
 			m.fpgaTime = rcs->GetFPGATime();
 			m.userButton = rcs->GetUserButton();
 			m.isSysActive = rcs->GetIsSysActive();
-			m.sysActiveStatus = rcs->GetSysActiveStatus();
 			m.isBrownedOut = rcs->GetIsBrownedOut();
 			m.inputVoltage = rcs->GetInputVoltage();
 			m.inputCurrent = rcs->GetInputCurrent();
@@ -77,6 +76,29 @@ void RobotControllerStateController::update(const ros::Time &time, const ros::Du
 			m.canData.txFullCount = rcs->GetCANTxFullCount();
 			m.canData.receiveErrorCount = rcs->GetCANReceiveErrorCount();
 			m.canData.transmitErrorCount = rcs->GetCANTransmitErrorCount();
+
+			m.fpgaVersion_status = rcs->GetFPGAVersionStatus();
+			m.fpgaRevision_status = rcs->GetFPGARevisionStatus();
+			m.fpgaTime_status = rcs->GetFPGATimeStatus();
+			m.userButton_status = rcs->GetUserButtonStatus();
+			m.isSysActive_status = rcs->GetIsSysActiveStatus();
+			m.isBrownedOut_status = rcs->GetIsBrownedOutStatus();
+			m.inputVoltage_status = rcs->GetInputVoltageStatus();
+			m.inputCurrent_status = rcs->GetInputCurrentStatus();
+			m.voltage3V3_status = rcs->GetVoltage3V3Status();
+			m.current3V3_status = rcs->GetCurrent3V3Status();
+			m.enabled3V3_status = rcs->GetEnabled3V3Status();
+			m.faultCount3V3_status = rcs->GetFaultCount3V3Status();
+			m.voltage5V_status = rcs->GetVoltage5VStatus();
+			m.current5V_status = rcs->GetCurrent5VStatus();
+			m.enabled5V_status = rcs->GetEnabled5VStatus();
+			m.faultCount5V_status = rcs->GetFaultCount5VStatus();
+			m.voltage6V_status = rcs->GetVoltage6VStatus();
+			m.current6V_status = rcs->GetCurrent6VStatus();
+			m.enabled6V_status = rcs->GetEnabled6VStatus();
+			m.faultCount6V_status = rcs->GetFaultCount6VStatus();
+			m.canData_status = rcs->GetCANDataStatus();
+
 
 			realtime_pub_->unlockAndPublish();
 		}
