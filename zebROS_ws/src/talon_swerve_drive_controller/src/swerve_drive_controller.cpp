@@ -353,43 +353,31 @@ bool TalonSwerveDriveController::init(hardware_interface::TalonCommandInterface 
 		ROS_ERROR("talon_swerve_drive_controller : could not read wheel_coords");
 		return false;
 	}
-	else
+	if(wheel_coords.getType() != XmlRpc::XmlRpcValue::TypeArray )
 	{
-		if(wheel_coords.getType() != XmlRpc::XmlRpcValue::TypeArray )
+	    ROS_ERROR("talon_swerve_drive_controller : param 'wheel_coords' is not a list");
+		return false;
+	}
+	for(int i=0; i < wheel_coords.size(); ++i)
+	{
+		if(wheel_coords[i].getType() != XmlRpc::XmlRpcValue::TypeArray )
 		{
-		    ROS_ERROR("talon_swerve_drive_controller : param 'wheel_coords' is not a list");
+			ROS_ERROR("talon_swerve_drive_controller : param wheel_coords[%d] is not a list", i);
 			return false;
 		}
-		else
+		if(wheel_coords[i].size() != 2)
 		{
-		    for(int i=0; i < wheel_coords.size(); ++i)
-			{
-				if(wheel_coords[i].getType() != XmlRpc::XmlRpcValue::TypeArray )
-				{
-					ROS_ERROR("talon_swerve_drive_controller : param wheel_coords[%d] is not a list", i);
-					return false;
-				}
-				else
-				{
-					if(wheel_coords[i].size() != 2)
-					{
-						ROS_ERROR("talon_swerve_drive_controller: param wheel_coords[%d] is not a pair", i);
-						return false;
-					}
-					else if(	wheel_coords[i][0].getType() != XmlRpc::XmlRpcValue::TypeDouble ||
-								wheel_coords[i][1].getType() != XmlRpc::XmlRpcValue::TypeDouble)
-					{
-						ROS_ERROR("talon_swerve_drive_controller : param wheel_coords[%d] is not a pair of doubles", i);
-						return false;
-					}
-					else
-					{
-						wheel_coords_[i][0] = wheel_coords[i][0];
-						wheel_coords_[i][1] = wheel_coords[i][1];
-					}
-				}
-			}
+			ROS_ERROR("talon_swerve_drive_controller: param wheel_coords[%d] is not a pair", i);
+			return false;
 		}
+		if(	wheel_coords[i][0].getType() != XmlRpc::XmlRpcValue::TypeDouble ||
+			wheel_coords[i][1].getType() != XmlRpc::XmlRpcValue::TypeDouble)
+		{
+			ROS_ERROR("talon_swerve_drive_controller : param wheel_coords[%d] is not a pair of doubles", i);
+			return false;
+		}
+			wheel_coords_[i][0] = wheel_coords[i][0];
+			wheel_coords_[i][1] = wheel_coords[i][1];
 	}
 
 	ROS_INFO_STREAM("Coords: " << wheel_coords_[0] << "   " << wheel_coords_[1] << "   " << wheel_coords_[2] << "   " << wheel_coords_[3]);
