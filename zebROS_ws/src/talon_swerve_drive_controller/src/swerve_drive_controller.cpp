@@ -670,7 +670,7 @@ void TalonSwerveDriveController::compOdometry(const Time &time, const double inv
 		odom_pub_.msg_.pose.pose.orientation = orientation;
 		odom_pub_.msg_.twist.twist.linear.x = command.lin[0];
 		odom_pub_.msg_.twist.twist.linear.y = command.lin[1];
-		odom_pub_.msg_.twist.twist.angular.x = command.ang;
+		odom_pub_.msg_.twist.twist.angular.z = command.ang;
 
 		odom_pub_.unlockAndPublish();
 
