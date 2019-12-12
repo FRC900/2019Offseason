@@ -66,6 +66,21 @@ class ServerNameAction {
 		{
 		}
 
+		//Use to make pauses while still checking timed_out_ and preempted_
+		void pause(const double duration)
+		{
+			const double pause_start_time = ros::Time::now().toSec();
+
+			while(!preempted_ && !timed_out_ && ros::ok())
+			{
+				preempted_ = as_.isPreemptRequested();
+				timed_out_ = ((ros::Time::now().toSec() - start_time_) >= server_timeout_);
+
+				if((ros::Time::now().toSec() - pause_start_time) >= duration)
+					break;
+			}
+		}
+
 		//define the function to be executed when the actionlib server is called
 		void executeCB(const behaviors::ThingGoalConstPtr &goal)
 		{
@@ -141,7 +156,7 @@ class ServerNameAction {
 
 			//if necessary, pause a bit between doing things (between piston firings usually)
 			/* e.g.
-			ros::Duration(sec_to_pause).sleep();
+			pause(sec_to_pause);
 			if(as_.isPreemptRequested() || !ros::ok()) { //always check for preempts after pausing for a significant duration
 				ROS_ERROR_STREAM(action_name_ << ": preempt after pausing for __________");
                                 ac_elevator_.cancellAllGoals();
