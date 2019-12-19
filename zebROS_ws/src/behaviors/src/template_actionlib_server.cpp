@@ -67,7 +67,7 @@ class ServerNameAction {
 		}
 
 		//Use to make pauses while still checking timed_out_ and preempted_
-		void pause(const double duration, const std::string &activity)
+		bool pause(const double duration, const std::string &activity)
 		{
 			const double pause_start_time = ros::Time::now().toSec();
 
@@ -78,14 +78,19 @@ class ServerNameAction {
 					preempted_ = true;
 					ROS_ERROR_STREAM("server_name_server: preempt during pause() - " << activity);
 				}
-				else if ((ros::Time::now().toSec() - start_time_) >= server_timeout_){
+				else if ((ros::Time::now().toSec() - start_time_) >= server_timeout_)
+				{
 					timed_out_ = true;
 					ROS_ERROR_STREAM("server_name_server: timeout during pause() - " << activity);
 				}
 
 				if((ros::Time::now().toSec() - pause_start_time) >= duration)
-					break;
+				{
+					return true; //pause worked like expected
+				}
 			}
+
+			return false; //wait loop must've been broken by preempt, global timeout, or ros not ok
 		}
 
 		//define the function to be executed when the actionlib server is called
