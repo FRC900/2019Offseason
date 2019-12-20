@@ -90,6 +90,10 @@
 #include <ctre/phoenix/platform/Platform.h>
 #include <ctre/phoenix/cci/Unmanaged_CCI.h>
 
+#ifdef __linux__
+#include <sched.h>
+#endif
+
 //
 // digital output, PWM, Pneumatics, compressor, nidec, talons
 //    controller on jetson  (local update = true, local hardware = false
@@ -579,7 +583,6 @@ void FRCRobotHWInterface::init(void)
 
 	navX_zero_ = -10000;
 
-
 	double t_now = ros::Time::now().toSec();
 
 	t_prev_robot_iteration_ = t_now;
@@ -605,6 +608,15 @@ void FRCRobotHWInterface::init(void)
 		ROS_ERROR("Failed to read robot_controller_read_hz in frcrobot_hw_interface");
 		robot_controller_read_hz_ = 20;
 	}
+
+#ifdef __linux__
+	struct sched_param schedParam;
+
+	schedParam.sched_priority = sched_get_priority_min(SCHED_RR);
+	ROS_INFO_STREAM("sched_setscheduler() returned "
+			<< sched_setscheduler(pthread_self(), SCHED_RR, &schedParam));
+#endif
+
 
 	ROS_INFO_NAMED("frcrobot_hw_interface", "FRCRobotHWInterface Ready.");
 }
