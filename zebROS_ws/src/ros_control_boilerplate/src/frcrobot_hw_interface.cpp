@@ -1121,6 +1121,7 @@ void FRCRobotHWInterface::read(ros::Duration &/*elapsed_time*/)
 
 			status = 0;
 			match_data_.setMatchTimeRemaining(HAL_GetMatchTime(&status));
+			match_data_.setGetMatchTimeStatus(std::to_string(status) + ": " + HAL_GetErrorMessage(status));
 			HAL_MatchInfo info;
 			HAL_GetMatchInfo(&info);
 
@@ -1130,6 +1131,7 @@ void FRCRobotHWInterface::read(ros::Duration &/*elapsed_time*/)
 
 			status = 0;
 			auto allianceStationID = HAL_GetAllianceStation(&status);
+			match_data_.setGetAllianceStationStatus(std::to_string(status) + ": " + HAL_GetErrorMessage(status));
 			DriverStation::Alliance color;
 			switch (allianceStationID) {
 				case HAL_AllianceStationID_kRed1:
@@ -1172,6 +1174,7 @@ void FRCRobotHWInterface::read(ros::Duration &/*elapsed_time*/)
 			match_data_.setReplayNumber(info.replayNumber);
 			status = 0;
 			match_data_.setBatteryVoltage(HAL_GetVinVoltage(&status));
+			match_data_.setGetVinVoltageStatus(std::to_string(status) + ": " + HAL_GetErrorMessage(status));
 		}
 		//read control word match data at full speed - contains enable info, and reads should be v fast
 		HAL_ControlWord controlWord;
@@ -1287,7 +1290,6 @@ void FRCRobotHWInterface::read(ros::Duration &/*elapsed_time*/)
 			robot_controller_state_.SetCANTransmitErrorCount(transmit_error_count);
 
 			robot_controller_state_.SetCANDataStatus(std::to_string(status) + ": " + HAL_GetErrorMessage(status));
-
 		}
 	}
 
