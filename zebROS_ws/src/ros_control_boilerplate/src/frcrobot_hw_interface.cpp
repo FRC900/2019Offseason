@@ -613,8 +613,10 @@ void FRCRobotHWInterface::init(void)
 	struct sched_param schedParam;
 
 	schedParam.sched_priority = sched_get_priority_min(SCHED_RR);
-	ROS_INFO_STREAM("sched_setscheduler() returned "
-			<< sched_setscheduler(pthread_self(), SCHED_RR, &schedParam));
+	auto rc = sched_setscheduler(gettid(), SCHED_RR, &schedParam);
+	ROS_INFO_STREAM("sched_setscheduler() returned " << rc
+			<< " priority = " << schedParam.sched_priority
+			<< " errno = " << errno << " (" << strerror(errno) << ")");
 #endif
 
 
