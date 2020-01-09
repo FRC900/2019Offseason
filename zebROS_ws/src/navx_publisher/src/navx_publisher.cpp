@@ -10,7 +10,6 @@
 #include "sensor_msgs/Imu.h"
 #include "nav_msgs/Odometry.h"
 #include "navXTimeSync/AHRS.h"
-#include "navx_publisher/stampedUInt64.h"
 #include <tf/transform_datatypes.h>
 
 using namespace std;
@@ -72,11 +71,9 @@ int main(int argc, char **argv)
 	// Set up publishers
 	// Raw_pub publishes in the ENU (east north up) orientation
 	// instead of NED (north east down)
-	ros::Publisher time_pub = nh.advertise<navx_publisher::stampedUInt64>("time", 75);
 	ros::Publisher imu_pub = nh.advertise<sensor_msgs::Imu>("imu", 75);
 	ros::Publisher raw_pub = nh.advertise<sensor_msgs::Imu>("raw", 75);
 	ros::Publisher odom_pub = nh.advertise<nav_msgs::Odometry>("odom", 75);
-	navx_publisher::stampedUInt64 timestamp;
 	sensor_msgs::Imu imu_msg;
 	sensor_msgs::Imu imu_msg_raw;
 	nav_msgs::Odometry odom;
@@ -144,13 +141,12 @@ int main(int argc, char **argv)
 	while (ros::ok())
 	{
 		unsigned long long nxstamp = nx.GetLastSensorTimestamp();
-		if (firstrun || (nxstamp != timestamp.data))
+		if (firstrun)
 		{
 			//set the timestamp for all headers
 			odom.header.stamp =
 				imu_msg.header.stamp =
-					imu_msg_raw.header.stamp =
-						timestamp.header.stamp = ros::Time::now();
+					imu_msg_raw.header.stamp = ros::Time::now();
 
 			float nx_roll;
 			float nx_pitch;
@@ -186,7 +182,6 @@ int main(int argc, char **argv)
 			imu_msg.linear_acceleration.x = nx_ax;
 			imu_msg.linear_acceleration.y = nx_ay;
 			imu_msg.linear_acceleration.z = nx_az;
-			timestamp.data = nx_stamp;
 
 			imu_msg_raw.orientation.x = imu_msg.orientation.x;
 			imu_msg_raw.orientation.y = imu_msg.orientation.y;
@@ -241,7 +236,6 @@ int main(int argc, char **argv)
 			odom.twist.twist.angular = imu_msg.angular_velocity;
 
 			//publish to ROS topics
-			time_pub.publish(timestamp);
 			imu_pub.publish(imu_msg);
 			odom_pub.publish(odom);
 			raw_pub.publish(imu_msg_raw);

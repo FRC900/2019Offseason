@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(base_trajectory)
 
+if(NOT WIN32)
+
 include ("../cmake_modules/CMakeOpt.cmake")
 
 ## Find catkin macros and libraries
@@ -180,3 +182,4 @@ install(TARGETS ${PROJECT_NAME}_node driver_node
 #   PATTERN ".svn" EXCLUDE
 # )
 
+endif()

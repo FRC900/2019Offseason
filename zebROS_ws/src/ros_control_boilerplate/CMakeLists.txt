@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(ros_control_boilerplate)
 
+if(NOT WIN32)
+
 include ("../cmake_modules/CMakeOpt.cmake")
 
 find_package(catkin REQUIRED COMPONENTS
@@ -449,3 +451,5 @@ install(DIRECTORY
 	PATTERN *~ EXCLUDE
 	PATTERN *.sw? EXCLUDE
 )
+
+endif()

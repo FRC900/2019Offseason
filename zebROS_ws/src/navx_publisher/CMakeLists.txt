@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(navx_publisher)
 
+if(NOT WIN32)
+
 include ("../cmake_modules/CMakeOpt.cmake")
 
 ## Find catkin macros and libraries
@@ -12,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   message_generation
   tf
+  frc_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -48,10 +51,10 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-add_message_files(
-  FILES
-  stampedUInt64.msg
-)
+# add_message_files(
+#   FILES
+#   stampedUInt64.msg
+# )
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -214,3 +217,4 @@ target_link_libraries(imu_to_rpy
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+endif()

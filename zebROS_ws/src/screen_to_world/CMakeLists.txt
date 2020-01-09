@@ -3,6 +3,8 @@ project(screen_to_world)
 
 include ("../cmake_modules/CMakeOpt.cmake")
 
+if(NOT WIN32)
+
 if (NOT DEFINED CMAKE_TOOLCHAIN_FILE)
 	## Find catkin macros and libraries
 	## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -200,4 +202,5 @@ if (NOT DEFINED CMAKE_TOOLCHAIN_FILE)
 
 	## Add folders to be run by python nosetests
 	# catkin_add_nosetests(test)
+endif()
 endif()

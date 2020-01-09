@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(path_to_goal)
 
+if(NOT WIN32)
+
 include("../cmake_modules/CMakeOpt.cmake")
 
 if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
@@ -209,4 +211,5 @@ install(TARGETS test_client
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 
+endif()
 endif()

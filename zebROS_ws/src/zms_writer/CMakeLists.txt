@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(zms_writer)
 
+if(NOT WIN32)
+
 include("../cmake_modules/CMakeOpt.cmake")
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -215,3 +217,4 @@ endif()
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+endif()

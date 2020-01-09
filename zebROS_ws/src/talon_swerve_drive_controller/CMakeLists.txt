@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(talon_swerve_drive_controller)
 
+if(NOT WIN32)
+
 include ("../cmake_modules/CMakeOpt.cmake")
 
 find_package(catkin REQUIRED COMPONENTS
@@ -94,3 +96,4 @@ install(TARGETS ${PROJECT_NAME}
 install(FILES ${PROJECT_NAME}_plugins.xml
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
+endif()

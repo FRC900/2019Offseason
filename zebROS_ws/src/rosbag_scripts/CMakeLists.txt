@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rosbag_scripts)
+if(NOT WIN32)
 
 include("../cmake_modules/CMakeOpt.cmake")
 
@@ -217,3 +218,4 @@ endif()
 # catkin_add_nosetests(test)
 
 
+endif()
